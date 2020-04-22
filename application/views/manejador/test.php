@@ -31,12 +31,7 @@
     </div>
     <br>
 
-    <div class="alert alert-success completada fade show" role="alert">
-    Consulta completada con exito
-    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-    <span aria-hidden="true">&times;</span>
-  </button>
-    </div>
+  
     <div id="mensajes"></div>
    
 
@@ -153,8 +148,6 @@ $("#btnSaveQuery").click(()=>{
             dataType: 'json',
             success: function(data){
                 $('#modalSave').modal('hide');
-            },error: function(data){
-                console.log(data);
             }
         
             })
@@ -168,30 +161,42 @@ $("#btnSaveQuery").click(()=>{
             data: {id: $('#conn').val(), query: $('#query').val()},
             dataType: 'json',
             success: function(data){
-                
-                if(data.errores){
+               
+                data.respuesta.forEach((respuesta)=>{
+                    if(respuesta.errores !=null){
 
-                data.errores.forEach(error => {
-                    $('#mensajes').append(`
-                    <div class="alert alert-danger error fade show" role="alert">
-                            ${error}
+                    respuesta.errores.forEach(error => { 
+                        $('#mensajes').append(`
+                        <div class="alert alert-danger error fade show" role="alert">
+                                ${error}
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    </div>
+                        `)
+                    });
+                    $(".error").show()
+                            var duration = 5000; //2 seconds
+                        setTimeout(function () { $('.error').alert('close'); }, duration);
+                    } else {
+                        if(respuesta.correcto != null){
+
+                        $('#mensajes').append(`
+                        <div class="alert alert-success completada fade show" role="alert">
+                    Consulta completada con exito
                     <button type="button" class="close" data-dismiss="alert" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
-            </button>
-    </div>
-                    `)
-                });
-                $(".error").show()
-                        var duration = 5000; //2 seconds
-                    setTimeout(function () { $('.error').alert('close'); }, duration);
-                } else {
-                    $(".completada").show()
-                        var duration = 2000; //2 seconds
-                    setTimeout(function () { $('.completada').alert('close'); }, duration);
+                    </button>
+                    </div>`);
+                        $(".completada").show()
+                            var duration = 2000; //2 seconds
+                        setTimeout(function () { $('.completada').alert('close'); }, duration);
+                        }
+                    }
+                })
+                
                 }
-            }
-        
-            })
+                     })
         });
 
 

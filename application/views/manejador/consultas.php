@@ -70,7 +70,7 @@
   </div>
 </div>
 
-<div id="porta" style="display: none;"></div>
+<div id="porta" ></div>
 <script>
 var consultas;
 $(document).ready(function(){
@@ -108,7 +108,8 @@ function copiar() {
     var id = $(this).val();
     let consulta = consultas[id];
     var dummy = $('<input>').val(consulta.consulta).appendTo('#porta').select()
-    document.execCommand('copy')
+    document.execCommand('copy');
+    $('#porta').empty();
   alert("Consulta copiada al portapapeles.");
 }
 function editar(){
@@ -154,8 +155,6 @@ $("#btnSaveQuery").click(()=>{
              alert('Actualizado correctamente');
              $('#modalSave').modal('hide');
 
-            },error: function(data){
-                console.log(data.responseText);
             }
         
             })

@@ -23,6 +23,7 @@ class Manejador extends CI_Controller {
 
         $errores = [];
         $correctas = [];
+        $respuesta= [];
         foreach ($data['id'] as  $id) {
 
             foreach ($dbs as $key => $db) {
@@ -33,26 +34,30 @@ class Manejador extends CI_Controller {
                         $pan= $result->execute();
                         if($pan == false){
 
-                        array_push($errores,$result->errorCode(). ' '.$result->errorInfo()[2]);
+                        array_push($errores, "error en la Base de datos {$db['name']}: ".$result->errorInfo()[2]);
 
                         }  else {
                             array_push($correctas, $db['name']. " correcto");
                         }
                         
                             } catch(PDOException $e){
-                                array_push($errores,"error en la tabla {$db['name']} ". $e->getMessage());
+                                array_push($errores,"error en la Base de datos {$db['name']}: ". $e->getMessage());
                             }
                 }
             }
 
         }
         if(!empty($errores)){
-            echo json_encode(['errores' =>$errores]);
-        } 
+            array_push($respuesta,['errores' =>$errores]);
+        }else{
+            array_push($respuesta,['errores' =>null]);
+        }
         if(!empty($correctas)){
-            echo json_encode(['correcto' =>$correctas]);
-        } 
-        
+            array_push($respuesta,['correcto' =>$correctas]);
+        } else{
+            array_push($respuesta,['correcto' =>null]);
+        }
+        print_r( json_encode(['respuesta' =>$respuesta]));
     }
     
     public function consultas(){
