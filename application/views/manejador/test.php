@@ -1,7 +1,33 @@
 
-   
+   <style>
+   .loader {
+  border: 16px solid #f3f3f3;
+  border-radius: 50%;
+  border-top: 16px solid #3498db;
+  width: 75px;
+  height: 75px;
+  -webkit-animation: spin 2s linear infinite;
+  animation: spin 1s linear infinite;
+  margin:auto;
+  left:0;
+  right:0;
+  top:0;
+  bottom:0;
+  position:fixed;
+  display: none;
+}
 
+@-webkit-keyframes spin {
+  0% { -webkit-transform: rotate(0deg); }
+  100% { -webkit-transform: rotate(360deg); }
+}
 
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}</style>
+
+<div class="loader"></div>
 <div class="container ">
 
 <div class="float-left border" style=" height: 15em;" >
@@ -27,7 +53,7 @@
         </div>
     <div class="container" align="center">
     
-         <textarea placeholder="Escriba la consulta" class="form-control bg-dark text-light " style=" width: 600px;height: 300px;" id="query" ></textarea>
+         <textarea placeholder="Escriba la consulta" class="form-control bg-dark text-light " style=" width: 600px;height: 400px;" id="query" ></textarea>
     </div>
     <br>
 
@@ -154,6 +180,7 @@ $("#btnSaveQuery").click(()=>{
         }
 })
     $('#ejecutar').on('click',()=>{
+        $('.loader').css('display','block');
         $('#mensajes').empty();
         $.ajax({
             url:'<?php echo base_url()  ?>manejador/ejecutar',
@@ -161,7 +188,8 @@ $("#btnSaveQuery").click(()=>{
             data: {id: $('#conn').val(), query: $('#query').val()},
             dataType: 'json',
             success: function(data){
-               
+                $('.loader').css('display','none');
+
                 data.respuesta.forEach((respuesta)=>{
                     if(respuesta.errores !=null){
 
@@ -176,8 +204,7 @@ $("#btnSaveQuery").click(()=>{
                         `)
                     });
                     $(".error").show()
-                            var duration = 5000; //2 seconds
-                        setTimeout(function () { $('.error').alert('close'); }, duration);
+                      
                     } else {
                         if(respuesta.correcto != null){
 
@@ -197,6 +224,7 @@ $("#btnSaveQuery").click(()=>{
                 
                 }
                      })
+
         });
 
 
