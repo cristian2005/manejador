@@ -28,19 +28,28 @@ class Manejador extends CI_Controller {
 
             foreach ($dbs as $key => $db) {
                 if($id == $db['id']){
+                    $myPDO = new PDO("mysql:host={$db['host']};dbname={$db['name']};port={$db['port']}", $db['user'], $db['pass']);
                     try{
-                        $myPDO = new PDO("mysql:host={$db['host']};dbname={$db['name']};port={$db['port']}", $db['user'], $db['pass']);
+                        $myPDO->beginTransaction();
+
                         $result= $myPDO->prepare($data['query']);
                         $pan= $result->execute();
                         if($pan == false){
-
+                            if ($myPDO->inTransaction()) {
+                                $myPDO->rollback();
+                            }
                         array_push($errores, "error en la Base de datos {$db['name']}: ".$result->errorInfo()[2]);
 
                         }  else {
+                            $myPDO->commit();
+
                             array_push($correctas, $db['name']. " correcto");
                         }
                         
                             } catch(PDOException $e){
+                                if ($myPDO->inTransaction()) {
+                                    $myPDO->rollback();
+                                }
                                 array_push($errores,"error en la Base de datos {$db['name']}: ". $e->getMessage());
                             }
                 }
@@ -70,10 +79,8 @@ class Manejador extends CI_Controller {
         return print_r(json_encode($consultas));
     }
     public function saveConsulta(){
-        // $consultas = $this->man->getConsultas();
         $postData = json_encode($this->input->post());
         $this->man->saveConsulta(json_decode($postData,true));
-        // return print_r($postData);
     }
 
     public function updateConsulta(){
@@ -101,4 +108,30 @@ class Manejador extends CI_Controller {
         return print_r($array_final);
 
     }
+
+ public function prueba(){
+
+
+
+$arrayquerys=['query1-bien','query2-bien','query3-bien','query4-mal','query5-bien'];
+
+$arrayRollback = [];
+        foreach ($arrayquerys as $b) {
+            array_push($arrayRollback,"echo {$b}");
+            echo $b;
+            if (strpos($b, 'mal') !== false) { 
+                echo "Aqui";
+                break 1;  // this will break both foreach loops
+            }
+            // unset($arrayRollback);
+        }
+    if (!empty($arrayRollback)) { 
+       foreach ($arrayRollback as $key => $rollback) {
+           call_user_func($rollback);
+       }
+    }
+ }
+
 }
+
+
