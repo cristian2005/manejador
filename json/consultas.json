@@ -1,1 +1,2 @@
+
 [{"nombreConsulta":"Para admySara","descripcion":"Sara","fecha":"2020-05-23","consulta":"CREATE TABLE `modulos_role` (\n  `idmodulos_role` INT NOT NULL AUTO_INCREMENT,\n  `idmodulo` INT NULL,\n  `idrole` INT NULL,\n  `fecha` DATETIME NULL DEFAULT current_timestamp,\n  PRIMARY KEY (`idmodulos_role`));\n\nALTER TABLE  `modulos_role` ADD UNIQUE (`idmodulo` ,`idrole`);"}]

@@ -13,7 +13,19 @@ class Manejador extends CI_Controller {
 	{
         $db = json_decode($this->man->getDb(),true);
         $this->layout->view('test',['dbs'=>$db]);
-	}
+    }
+    
+    function string_between_two_string($str, $starting_word, $ending_word) 
+{ 
+    $subtring_start = strpos($str, $starting_word); 
+    //Adding the strating index of the strating word to  
+    //its length would give its ending index 
+    $subtring_start += strlen($starting_word);   
+    //Length of our required sub string 
+    $size = strpos($str, $ending_word, $subtring_start) - $subtring_start;   
+    // Return the substring from the index substring_start of length size  
+    return substr($str, $subtring_start, $size);   
+} 
 	public function ejecutar()
 	{
         $postData = json_encode($this->input->post());
@@ -30,20 +42,31 @@ class Manejador extends CI_Controller {
                 if($id == $db['id']){
                     $myPDO = new PDO("mysql:host={$db['host']};dbname={$db['name']};port={$db['port']}", $db['user'], $db['pass']);
                     try{
-                        $myPDO->beginTransaction();
+                        if (strstr($data['query'], "PROCEDURE")) {
+                            $mysqli = new mysqli($db['host'], $db['user'], $db['pass'], $db['name'],$db['port']);
+                            $nombre_proc = $this->string_between_two_string ($data['query'],"PROCEDURE", '(');
+                            if (!$mysqli->query("DROP PROCEDURE IF EXISTS $nombre_proc[1]") ||  !$mysqli->query($data['query'])) {
+                                array_push($errores, "Falló la creación del procedimiento almacenado: (" . $mysqli->errno . ") " . $mysqli->error);
+                            } else {
+                                array_push($correctas, $db['name']. " correcto");
 
-                        $result= $myPDO->prepare($data['query']);
-                        $pan= $result->execute();
-                        if($pan == false){
-                            if ($myPDO->inTransaction()) {
-                                $myPDO->rollback();
                             }
-                        array_push($errores, "error en la Base de datos {$db['name']}: ".$result->errorInfo()[2]);
+                        } else {
+                            $myPDO->beginTransaction();
 
-                        }  else {
-                            $myPDO->commit();
-
-                            array_push($correctas, $db['name']. " correcto");
+                            $result= $myPDO->prepare($data['query']);
+                            $pan= $result->execute();
+                            if($pan == false){
+                                if ($myPDO->inTransaction()) {
+                                    $myPDO->rollback();
+                                }
+                                array_push($errores, "error en la Base de datos {$db['name']}: ".$result->errorInfo()[2]);
+                                
+                            }  else {
+                                $myPDO->commit();
+                                
+                                array_push($correctas, $db['name']. " correcto");
+                            }
                         }
                         
                             } catch(PDOException $e){
